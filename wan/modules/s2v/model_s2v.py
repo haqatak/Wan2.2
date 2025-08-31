@@ -64,7 +64,7 @@ def rope_apply(x, grid_sizes, freqs, start=None):
     output = []
     for i, _ in enumerate(x):
         s = x.size(1)
-        x_i = torch.view_as_complex(x[i, :s].to(torch.float64).reshape(
+        x_i = torch.view_as_complex(x[i, :s].to(torch.float32).reshape(
             s, n, -1, 2))
         freqs_i = freqs[i, :s]
         # apply rotary embedding
@@ -83,7 +83,7 @@ def rope_apply_usp(x, grid_sizes, freqs):
     for i, _ in enumerate(x):
         s = x.size(1)
         # precompute multipliers
-        x_i = torch.view_as_complex(x[i, :s].to(torch.float64).reshape(
+        x_i = torch.view_as_complex(x[i, :s].to(torch.float32).reshape(
             s, n, -1, 2))
         freqs_i = freqs[i]
         freqs_i_rank = freqs_i
