@@ -35,7 +35,7 @@ def rope_params(max_seq_len, dim, theta=10000):
     return freqs
 
 
-@torch.amp.autocast("cpu", enabled=False)
+@torch.amp.autocast('cpu', enabled=False)
 def rope_apply(x, grid_sizes, freqs):
     n, c = x.size(2), x.size(3) // 2
 
@@ -445,7 +445,7 @@ class WanModel(ModelMixin, ConfigMixin):
             x = [torch.cat([u, v], dim=0) for u, v in zip(x, y)]
 
         # embeddings
-        x = [self.patch_embedding(u.unsqueeze(0)) for u in x]
+        x = [self.patch_embedding(u.unsqueeze(0).to(self.patch_embedding.weight.dtype)) for u in x]
         grid_sizes = torch.stack(
             [torch.tensor(u.shape[2:], dtype=torch.long) for u in x])
         x = [u.flatten(2).transpose(1, 2) for u in x]

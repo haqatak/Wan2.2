@@ -11,13 +11,10 @@ from copy import deepcopy
 from functools import partial
 
 import numpy as np
+import torch
 import torch.distributed as dist
 import torchvision.transforms.functional as TF
-import platform
-if platform.system() == 'Darwin':
-    from eva_decord import VideoReader
-else:
-    from decord import VideoReader
+from decord import VideoReader
 from PIL import Image
 from safetensors import safe_open
 from torchvision import transforms

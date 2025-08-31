@@ -14,7 +14,4 @@ imageio-ffmpeg
 numpy>=1.23.5,<2
 einops
 librosa
-# decord can be problematic on some platforms.
-# If you have issues, try installing eva-decord instead:
-# pip install eva-decord
-decord
+eva-decord
