@@ -1,17 +1,29 @@
 # Copyright 2024-2025 The Alibaba Wan Team Authors. All rights reserved.
 import torch
+import platform
 
-try:
-    import flash_attn_interface
-    FLASH_ATTN_3_AVAILABLE = True
-except ModuleNotFoundError:
-    FLASH_ATTN_3_AVAILABLE = False
+METAL_FLASH_ATTN_AVAILABLE = False
+if platform.system() == "Darwin":
+    try:
+        import metal_flash_attention as flash_attn
+        METAL_FLASH_ATTN_AVAILABLE = True
+        FLASH_ATTN_3_AVAILABLE = False
+        FLASH_ATTN_2_AVAILABLE = False
+    except ImportError:
+        pass
 
-try:
-    import flash_attn
-    FLASH_ATTN_2_AVAILABLE = True
-except ModuleNotFoundError:
-    FLASH_ATTN_2_AVAILABLE = False
+if not METAL_FLASH_ATTN_AVAILABLE:
+    try:
+        import flash_attn_interface
+        FLASH_ATTN_3_AVAILABLE = True
+    except ModuleNotFoundError:
+        FLASH_ATTN_3_AVAILABLE = False
+
+    try:
+        import flash_attn
+        FLASH_ATTN_2_AVAILABLE = True
+    except ModuleNotFoundError:
+        FLASH_ATTN_2_AVAILABLE = False
 
 import warnings
 
@@ -145,6 +157,17 @@ def attention(
     dtype=torch.bfloat16,
     fa_version=None,
 ):
+    if METAL_FLASH_ATTN_AVAILABLE:
+        # Assuming metal_flash_attention has a similar API to the original
+        # This part is speculative and may need adjustment
+        return flash_attn.flash_attn_func(
+            q=q,
+            k=k,
+            v=v,
+            dropout_p=dropout_p,
+            softmax_scale=softmax_scale,
+            causal=causal,
+        )
     if FLASH_ATTN_2_AVAILABLE or FLASH_ATTN_3_AVAILABLE:
         return flash_attention(
             q=q,
