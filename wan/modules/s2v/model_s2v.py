@@ -72,7 +72,7 @@ def rope_apply(x, grid_sizes, freqs, start=None):
         x_i = torch.cat([x_i, x[i, s:]])
         # append to collection
         output.append(x_i)
-    return torch.stack(output).float()
+    return torch.stack(output).type_as(x)
 
 
 @torch.amp.autocast("cpu", enabled=False)
@@ -91,7 +91,7 @@ def rope_apply_usp(x, grid_sizes, freqs):
         x_i = torch.cat([x_i, x[i, s:]])
         # append to collection
         output.append(x_i)
-    return torch.stack(output).float()
+    return torch.stack(output).type_as(x)
 
 
 def sp_attn_forward_s2v(self,
