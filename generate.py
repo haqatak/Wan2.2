@@ -258,7 +258,10 @@ def generate(args):
     rank = int(os.getenv("RANK", 0))
     world_size = int(os.getenv("WORLD_SIZE", 1))
     local_rank = int(os.getenv("LOCAL_RANK", 0))
-    device = local_rank
+    if torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        device = local_rank
     _init_logging(rank)
 
     if args.offload_model is None:
@@ -266,7 +269,8 @@ def generate(args):
         logging.info(
             f"offload_model is not specified, set to {args.offload_model}.")
     if world_size > 1:
-        torch.cuda.set_device(local_rank)
+        if torch.cuda.is_available():
+            torch.cuda.set_device(local_rank)
         dist.init_process_group(
             backend="nccl",
             init_method="env://",
@@ -472,7 +476,8 @@ def generate(args):
             merge_video_audio(video_path=args.save_file, audio_path=args.audio)
     del video
 
-    torch.cuda.synchronize()
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
     if dist.is_initialized():
         dist.barrier()
         dist.destroy_process_group()
